@@ -11,7 +11,7 @@ int main(int argc, char ** argv)
 	int data2=5;
 
 	int valeur;
-	//int (*component_value)(int, int);
+	int (*component_value)(int, int);
 	
 	void *handle;
 	char *error;
@@ -46,13 +46,13 @@ int main(int argc, char ** argv)
 	dlerror();    // Clear any existing error
 	
 	if (arg == "Composant1") {
-		int (*component_value)(int,int) = (int (*)(int,int)) dlsym(handle, "composant1");
+		component_value = (int (*)(int,int)) dlsym(handle, "composant1");
 		std::cout << "ok" << std::endl;
 		valeur = component_value(data1,data2);
 		//std::cout << getComposant1Version() << std::endl;
 		std::cout << "valeur 1 :" << valeur << std::endl;
 	} else if (arg == "Composant2") {
-		int (*component_value)(int,int) = (int (*)(int,int)) dlsym(handle, "composant2");
+		component_value = (int (*)(int,int)) dlsym(handle, "composant2");
 		std::cout << "ok" << std::endl;
 		valeur = component_value(data1,data2);
 		std::cout << "valeur 2 :" << valeur << std::endl;
