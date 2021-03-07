@@ -1,8 +1,9 @@
 
 #include <iostream>
-#include "Composant1.h"
-#include "Composant2.h"
 #include <dlfcn.h>
+#include <string>
+//#include "Composant1.h"
+//#include "Composant2.h"
 
 int main(int argc, char ** argv)
 {
@@ -10,32 +11,53 @@ int main(int argc, char ** argv)
 	int data2=5;
 
 	int valeur;
+	//int (*component_value)(int, int);
 	
 	void *handle;
 	char *error;
+	std::string arg = argv[1];
 	
-	std::cout << "argv = '" << argv[1] << "'" << std::endl;
+	std::cout << "argv[1] = '" << arg << "'" << std::endl;
 
 	// Choose component
-	if (argv[1] == "Composant1") {
-		std::cout << "1" << std::endl;//handle = dlopen("../Composant1/libComposant1.so", RTLD_LAZY);
-	} else if (argv[1] == "Composant2") {
-		std::cout << "2" << std::endl;//handle = dlopen("../Composant2/libComposant2.so", RTLD_LAZY);
+	if (arg == "Composant1") {
+		handle = dlopen("../Composant1/libComposant1.so", RTLD_NOW);
+		//int (*component_value)(int,int) = (int (*)(int,int)) dlsym(handle, "composant1");
+		//*(void **) (&component_value) = dlsym(handle, "composant1");
+	} else if (arg == "Composant2") {
+		handle = dlopen("../Composant2/libComposant2.so", RTLD_NOW);
+		//int (*component_value)(int,int) = (int (*)(int,int)) dlsym(handle, "composant2");
+		//*(void **) (&component_value) = dlsym(handle, "composant2");
 	}
-	/*
+	
+	// Failure
 	if (!handle) {
 		fprintf(stderr, "%s\n", dlerror());
 		exit(EXIT_FAILURE);
 	}
+	/*
+	if (!component_value) {
+		// no such symbol
+		fprintf(stderr, "Error: %s\n", dlerror());
+		dlclose(handle);
+		return EXIT_FAILURE;
+	}*/
 
-	dlerror();    // Clear any existing error */
+	dlerror();    // Clear any existing error
 	
-	if (argv[1] == "Composant1") {
-		//valeur=composant1(data1,data2);
+	if (arg == "Composant1") {
+		int (*component_value)(int,int) = (int (*)(int,int)) dlsym(handle, "composant1");
+		std::cout << "ok" << std::endl;
+		valeur = component_value(data1,data2);
 		//std::cout << getComposant1Version() << std::endl;
-		std::cout << "v1" << std::endl;//std::cout << "valeur 1 :" << valeur << std::endl;
-	} else if (argv[1] == "Composant2") {
-		//valeur=composant2(data1,data2);
-		std::cout << "v2" << std::endl;//std::cout << "valeur 2 :" << valeur << std::endl;
+		std::cout << "valeur 1 :" << valeur << std::endl;
+	} else if (arg == "Composant2") {
+		int (*component_value)(int,int) = (int (*)(int,int)) dlsym(handle, "composant2");
+		std::cout << "ok" << std::endl;
+		valeur = component_value(data1,data2);
+		std::cout << "valeur 2 :" << valeur << std::endl;
 	}
+
+	dlclose(handle);
+	return EXIT_SUCCESS;
 }
